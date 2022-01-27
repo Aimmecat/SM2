@@ -28,6 +28,7 @@ import math
     reference: https://blog.csdn.net/godleaf/article/details/79844074?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522164284849316780271940804%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=164284849316780271940804&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-79844074.first_rank_v2_pc_rank_v29&utm_term=%E5%88%86%E6%95%B0%E5%8F%96%E6%A8%A1&spm=1018.2226.3001.4187
 """
 
+
 # x^k
 def Rapid_Mod(x, k, p):
     ret = 1
@@ -38,18 +39,25 @@ def Rapid_Mod(x, k, p):
         x = (x * x) % p
     return ret
 
+
 # g^a
-def Rapid_Exp(g, a, q):
-    e = a % (q - 1)
+def Rapid_Exp(g, a, p):
+    e = a % (p - 1)
     if e == 0:
         return 1
     bin_e = bin(e).replace('0b', '')[1:]
     x = g
     for ei in bin_e:
-        x = x * x % q
+        x = x * x % p
         if ei == '1':
-            x = g * x % q
+            x = g * x % p
     return x
+
+
+"""
+    Get Fraction Mod, You can use it as follow:
+        Get_Fraction_Mod(1, 2, 17) --> 1/2 mod 19 = 10
+"""
 
 
 def Get_Fraction_Mod(numerator, denominator, p):
@@ -62,8 +70,10 @@ def Get_Fraction_Mod(numerator, denominator, p):
     This show how to process negative number
 """
 
+
 def Get_Number_Mod(number, p):
     if number >= 0:
         return number % p
     else:
         return number - p * math.floor(number / p)
+

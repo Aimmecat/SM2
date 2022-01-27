@@ -68,6 +68,12 @@ class Point(object):
             a = hex(self.a).replace('0x', '')
             return Point(new_x, new_y, p, a)
 
+    def Get_X(self):
+        return hex(self.x).replace('0x', '').upper()
+
+    def Get_Y(self):
+        return hex(self.y).replace('0x', '').upper()
+
 
 class AdditiveIdentityElement(Point):
     def __init__(self):

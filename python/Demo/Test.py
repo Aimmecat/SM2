@@ -1,41 +1,52 @@
-from SM3 import SM3
-import Utils.TransformData as tf
-from Algorithm.TimesPoint import SlideWindow, BinaryExpansion, AddSub
-from Utils.mathoptimize import Get_Fraction_Mod
-from ECC import Point
+import time
+from Encryption import CreatSM2EncryptionTime
+from Decryption import CreatSM2DecryptionTime
+from Signature import CreatSM2SignatureTime
+from Verify import CreateSM2VerifyTime
+from Utils.TransformData import Beauty_Show_Hex
 
-usr = "ALICE123@YAHOO.COM"
-IDa = "414C494345313233405941484F4F2E434F4D"
-ENTLa = "0090"
-message = "message digest"
-p  = "8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3"
-a  = "787968B4FA32C3FD2417842E73BBFEFF2F3C848B6831D7E0EC65228B3937E498"
-b  = "63E4C6D3B23B0C849CF84241484BFE48F61D59A5B16BA06E6E12D1DA27C5249A"
-xg = "421DEBD61B62EAB6746434EBC3CC315E32220B3BADD50BDC4C4E6C147FEDD43D"
-yg = "0680512BCBB42C07D47349D2153B70C4E5D7FDFCBFA36EA1A85841B9E46E09A2"
-n  = "8542D69E4C044F18E8B92435BF6FF7DD297720630485628D5AE74EE7C32E79B7"
-dA = "128B2FA8BD433C6C068C8D803DFF79792A519A55171B1B650C23661D15897263"
-xa = "0AE4C7798AA0F119471BEE11825BE46202BB79E2A5844495E97C04FF4DF2548A"
-ya = "7C0240F88F1CD4E16352A73C17B7F16F07353E53A176D684A9FE0C6BB798E857"
-k  = "6CB28D99385C175C94F94E934817663FC176D925DD72B727260DBAAE1FB2F96F"
+Loop = 10
 
+print('--------------------------------------------------------------------------')
+print("Encryption")
+Encryption_Time_Start = time.time()
+ret = ''
+for i in range(Loop):
+    ret = CreatSM2EncryptionTime()
+Encryption_Time_End = time.time()
+use_time = str((Encryption_Time_End - Encryption_Time_Start) * 1000 / Loop) + 'ms'
+print("The result of Encryption is:\t" + Beauty_Show_Hex(ret))
+print('Encryption:\t' + use_time)
 
-# 生成摘要
-m = ENTLa + IDa + a + b + xg + yg + xa + ya
-sm3 = SM3()
-Za = sm3.CreateHv(m)
-ascii_m = tf.Trans_AsciiEncode(message)
-M = Za + ascii_m
-# 密码杂凑函数值
-e = sm3.CreateHv(M)
-e = tf.Trans_Bytes2Int(tf.Trans_Bits2Bytes(bin(int(e, 16)).replace('0b', '')))
-# 计算椭圆曲线点
-G = Point(xg, yg, p, a)
-point = AddSub(k, G)
-x1 = tf.Trans_Domain2Int(point.x)
-# (e + x1) mod n
-r = (e + x1) % int(n, 16)
-# s
-# print(hex(s))
-s = (Get_Fraction_Mod(1, (1 + int(dA, 16)), int(n, 16)) * (int(k, 16) - r * int(dA, 16))) % int(n, 16)
-print(hex(s).replace('0x', ''))
+print('--------------------------------------------------------------------------')
+print("Decryption")
+Decryption_Time_Start = time.time()
+for i in range(Loop):
+    ret = CreatSM2DecryptionTime()
+Decryption_Time_End = time.time()
+use_time = str((Decryption_Time_End - Decryption_Time_Start) * 1000 / Loop) + 'ms'
+print("The result of Encryption is:\t" + ret)
+print('Decryption:\t' + use_time)
+
+print('--------------------------------------------------------------------------')
+print("Signature")
+Signature_Time_Start = time.time()
+R = ''
+S = ''
+for i in range(Loop):
+    R, S = CreatSM2SignatureTime()
+Signature_Time_End = time.time()
+use_time = str((Signature_Time_End - Signature_Time_Start) * 1000 / Loop) + 'ms'
+print("The result of Signature is:\tR:" + Beauty_Show_Hex(R))
+print("The result of Signature is:\tS:" + Beauty_Show_Hex(S))
+print('Signature:\t' + use_time)
+
+print('--------------------------------------------------------------------------')
+print("Verify")
+Verify_Time_Start = time.time()
+for i in range(Loop):
+    ret = CreateSM2VerifyTime()
+Verify_Time_End = time.time()
+use_time = str((Verify_Time_End - Verify_Time_Start) * 1000 / Loop) + 'ms'
+print("The result of Verify is:\t" + Beauty_Show_Hex(ret))
+print('Verify:\t' + use_time)

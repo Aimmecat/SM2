@@ -1,6 +1,8 @@
 import math
 from SM3 import SM3
+
 v = 256
+
 
 def KDF(Z: str, k_len):
     cnt = 1
@@ -21,9 +23,7 @@ def KDF(Z: str, k_len):
     K += tail
     return K
 
-
 # x2 = '64D20D27D0632957F8028C1E024F6B02EDF23102A566C932AE8BD613A8E865FE'
 # y2 = '58D225ECA784AE300A81A2D48281A828E1CEDF11C4219099840265375077BF78'
 # klen = 152
-#
 # print(KDF(x2+y2, klen))
