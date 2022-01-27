@@ -24,9 +24,11 @@ def CreateSM2Verify():
     point = point1 + point2
     r = (int(e, 16) + point.x) % int(n, 16)
     r = hex(r).replace('0x', '').upper()
-    return r == R
+    return r
 
+def CreateSM2VerifyTime():
+    return CreateSM2Verify()
 
-result = CreateSM2Verify()
-print(result)
+# result = CreateSM2Verify()
+# print(result)
 

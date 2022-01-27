@@ -255,8 +255,10 @@ def Trans_Bytes2Point(a, b, q, domain, compress, S):
 def Trans_SingleBin2Hex(data: str):
     return hex(int(data, 2)).replace('0x', '')
 
+
 def Trans_SingleHex2Bin(data: str):
     return bin(int(data, 16)).replace('0b', '')
+
 
 def Trans_Bin2Hex(data: str):
     ret = ''
@@ -264,8 +266,19 @@ def Trans_Bin2Hex(data: str):
     data = '0' * (4 - length % 4) + data
     length = int(len(data) / 4)
     for idx in range(length):
-        ret += Trans_SingleBin2Hex(data[idx*4: (idx+1)*4])
+        ret += Trans_SingleBin2Hex(data[idx * 4: (idx + 1) * 4])
     return ret
+
+
+"""
+    example: 
+        m = 'Hello'
+        ret = Trans_AsciiEncode(m)
+        print(ret)
+        
+        ret = '48656c6c6f'
+"""
+
 
 def Trans_AsciiEncode(m: str):
     ret = ""
@@ -275,9 +288,45 @@ def Trans_AsciiEncode(m: str):
         ret += add
     return hex(int(ret, 2)).replace('0x', '')
 
+
+"""
+    example:
+        m = '48656c6c6f'
+        ret = Trans_AsciiDecode(m)
+        print(ret)
+        
+        ret = 'Hello'
+"""
+
+
 def Trans_AsciiDecode(m: str):
     ret = ""
     l = len(m) // 2
     for i in range(l):
-        ret += chr(int(m[i*2: (i+1)*2], 16))
+        ret += chr(int(m[i * 2: (i + 1) * 2], 16))
     return ret
+
+
+"""
+    example:
+        m = 'AABBCCDDEEFF'
+        ret = Beauty_Show_Hex(m)
+        print(ret)
+        
+        ret = '0000AABB CCDDEEFF'
+"""
+
+
+def Beauty_Show_Hex(m: str):
+    ret = ''
+    l = math.ceil(len(m) / 8)
+    m = '0' * (8 * l - len(m)) + m
+    cnt = 0
+    for single_hex in m:
+        ret += single_hex
+        cnt += 1
+        if cnt == 8:
+            ret += ' '
+            cnt = 0
+    return ret
+
