@@ -1,15 +1,16 @@
 import random
 import Algorithm.Montgomery as mg
 import time as t
+from Utils.mathoptimize import Get_Fraction_Mod
 
 """
     生成测试的随机数列表
     范围: 2 ** 256 ~ 2 ** 512
 """
 
-l = 1000
+l = 2000
 
-def CreateRandomNumber(start=2 ** 256, end=2 ** 512):
+def CreateRandomNumber(start=2 ** 256 - 10000, end=2 ** 256):
     global l
     a = []
     b = []
@@ -24,7 +25,7 @@ if __name__ == "__main__":
     n = int('8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3', 16)
 
     # 蒙哥马利预计算
-    r, r1, r2, _n = mg.MontgomeryPreCalculate(n)
+    r, r1, r2, _n = mg.MontgomeryPreCalculate(n, 256)
 
     print("----------------------------------------------------------------")
     print('a mod n')
@@ -89,6 +90,31 @@ if __name__ == "__main__":
 
     print('The result of Rapid method is ' + str(ret == ret1))
     print('The result of Montgomery method is ' + str(ret == ret2))
+
+    print("----------------------------------------------------------------")
+    print('a / b mod n')
+
+    ret = []
+    ret1 = []
+    ret2 = []
+
+    # 快速模除、蒙哥马利模除验证与测速
+    t1 = t.time()
+    for idx in range(l):
+        ret.append(Get_Fraction_Mod(a[idx], b[idx], n))
+    t2 = t.time()
+
+    print('Rapid method use time:     \t:' + str((t2 - t1) * 1000 / l) + 'ms')
+
+    t3 = t.time()
+    for idx in range(l):
+        ret1.append(mg.MontgomeryDivisionMod(a[idx], b[idx], n, r, r1, r2, _n))
+    t4 = t.time()
+
+    print('Montgomery method use time \t:' + str((t4 - t3) * 1000 / l) + 'ms')
+
+    print('The result of Rapid method is ' + str(ret == ret1))
+    print('The result of Montgomery method is ' + str(ret == ret1))
 
     # print("----------------------------------------------------------------")
     # print('a ** b mod n')

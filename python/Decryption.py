@@ -1,23 +1,23 @@
-from Algorithm.TimesPoint import AddSub
 from ECC import Point
 from Utils.KDF import KDF
 from Utils.TransformData import Trans_AsciiDecode
 from SM3 import SM3
+from SM2 import GetSM2Parameter
 
-p = "8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3"
-a = "787968B4FA32C3FD2417842E73BBFEFF2F3C848B6831D7E0EC65228B3937E498"
-dB = "1649AB77A00637BD5E2EFE283FBF353534AA7F7CB89463F208DDBC2920BB0DA0"
+dB = "3945208F 7B2144B1 3F36E38A C6D39F95 88939369 2860B51A 42FB81EF 4DF7C5B8".replace(' ', '')
 k_len = 152
 
-C1 = '04245C26FB68B1DDDDB12C4B6BF9F2B6D5FE60A383B0D18D1C4144ABF17F6252E776CB9264C2A7E88E52B19903FDC47378F605E36811F5C07423A24B84400F01B8'
-C2 = '650053A89B41C418B0C3AAD00D886C00286467'
-C3 = '9C3D7360C30156FAB7C80A0276712DA9D8094A634B766D3A285E07480653426D'
+C1 = '0404EBFC718E8D1798620432268E77FEB6415E2EDE0E073C0F4F640ECD2E149A73E858F9D81E5430A57B36DAAB8F950A3C64E6EE6A63094D99283AFF767E124DF0'
+C2 = '21886ca989ca9c7d58087307ca93092d651efa'
+C3 = '59983C18F809E262923C53AEC295D30383B54E39D609D160AFCB1908D0BD8766'
+
 
 def CreatSM2Decryption(C1: str, C2: str, C3: str):
+    p, a, _, _, _, _ = GetSM2Parameter()
     C1 = Point(C1[2:66], C1[66:], p, a)
-    point = AddSub(dB, C1)
-    x = hex(point.x).replace('0x', '')
-    y = hex(point.y).replace('0x', '')
+    point = C1.PointMultiply(dB)
+    x = point.Get_X()
+    y = point.Get_Y()
     t = KDF(x + y, k_len)
     M = hex(int(C2, 16) ^ int(t, 16)).replace('0x', '')
     sm3 = SM3()
@@ -25,6 +25,7 @@ def CreatSM2Decryption(C1: str, C2: str, C3: str):
     if u.upper() == C3.upper():
         return Trans_AsciiDecode(M.upper())
 
+
 def CreatSM2DecryptionTime():
     return CreatSM2Decryption(C1, C2, C3)
-# print(CreatSM2Decryption(C1, C2, C3))
+
