@@ -1,27 +1,26 @@
 from SM3 import SM3
+from SM2 import GetSM2Parameter, GetK
 import Utils.TransformData as tf
-from Algorithm.TimesPoint import AddSub
-from Utils.mathoptimize import Get_Fraction_Mod
 from ECC import Point
+import Algorithm.Montgomery as mg
 
-usr = "ALICE123@YAHOO.COM"
-ENTLa = "0090"
+ENTLa = "0080"
 m = "message digest"
-p  = "8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3"
-a  = "787968B4FA32C3FD2417842E73BBFEFF2F3C848B6831D7E0EC65228B3937E498"
-b  = "63E4C6D3B23B0C849CF84241484BFE48F61D59A5B16BA06E6E12D1DA27C5249A"
-n  = "8542D69E4C044F18E8B92435BF6FF7DD297720630485628D5AE74EE7C32E79B7"
-xg = "421DEBD61B62EAB6746434EBC3CC315E32220B3BADD50BDC4C4E6C147FEDD43D"
-yg = "0680512BCBB42C07D47349D2153B70C4E5D7FDFCBFA36EA1A85841B9E46E09A2"
-dA = "128B2FA8BD433C6C068C8D803DFF79792A519A55171B1B650C23661D15897263"
-xa = "0AE4C7798AA0F119471BEE11825BE46202BB79E2A5844495E97C04FF4DF2548A"
-ya = "7C0240F88F1CD4E16352A73C17B7F16F07353E53A176D684A9FE0C6BB798E857"
-k  = "6CB28D99385C175C94F94E934817663FC176D925DD72B727260DBAAE1FB2F96F"
+IDa = '31323334 35363738 31323334 35363738'.replace(' ', '')
+dA = "3945208F 7B2144B1 3F36E38A C6D39F95 88939369 2860B51A 42FB81EF 4DF7C5B8".replace(' ', '')
+xa = "09F9DF31 1E5421A1 50DD7D16 1E4BC5C6 72179FAD 1833FC07 6BB08FF3 56F35020".replace(' ', '')
+ya = "CCEA490C E26775A5 2DC6EA71 8CC1AA60 0AED05FB F35E084A 6632F607 2DA9AD13".replace(' ', '')
+
+r0 = 115792089237316195423570985008687907853269984665640564039457584007913129639936
+r1 = 26959946667150639794667015087208360940682819471613774651619690594013
+r2 = 13890758876747366292380987140861871730726264343299237038422391206777195679520
+_n = 50307568889517732031517334307777217170252470892231192406845782083964144781685
 
 
-def CreatSM2Signature(message):
+def CreatSM2Signature(IDa, ENTLa, message, xa, ya, dA):
+    # 获取参数
+    p, a, b, n, xg, yg = GetSM2Parameter()
     # 生成摘要
-    IDa = tf.Trans_AsciiEncode(usr)
     total_m = ENTLa + IDa + a + b + xg + yg + xa + ya
     sm3 = SM3()
     Za = sm3.CreateHv(total_m)
@@ -32,17 +31,22 @@ def CreatSM2Signature(message):
     e = tf.Trans_Bytes2Int(tf.Trans_Bits2Bytes(bin(int(e, 16)).replace('0b', '')))
     # 计算椭圆曲线点
     G = Point(xg, yg, p, a)
-    point = AddSub(k, G)
+    k = GetK("signature")
+    point = G.PointMultiply(k)
     x1 = tf.Trans_Domain2Int(point.x)
     # (e + x1) mod n
     r = (e + x1) % int(n, 16)
     # s
-    s = (Get_Fraction_Mod(1, (1 + int(dA, 16)), int(n, 16)) * (int(k, 16) - r * int(dA, 16))) % int(n, 16)
+    inv_dA = mg.MontgomeryDivisionMod(1, 1 + int(dA, 16), int(n, 16), r0, r1, r2, _n)
+    s = mg.MontgomeryMultiplyMod(inv_dA, int(k, 16) - r * int(dA, 16), int(n, 16), r0, r2, _n)
     return hex(r).replace('0x', '').upper(), hex(s).replace('0x', '').upper()
 
-def CreatSM2SignatureTime():
-    return CreatSM2Signature(m)
 
-# R, S = CreatSM2Signature(m)
-# print(R)
-# print(S)
+def CreatSM2SignatureTime():
+    ret = CreatSM2Signature(IDa=IDa,
+                            ENTLa=ENTLa,
+                            message=m,
+                            xa=xa,
+                            ya=ya,
+                            dA=dA)
+    return ret

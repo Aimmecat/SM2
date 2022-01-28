@@ -25,7 +25,7 @@ for i in range(Loop):
     ret = CreatSM2DecryptionTime()
 Decryption_Time_End = time.time()
 use_time = str((Decryption_Time_End - Decryption_Time_Start) * 1000 / Loop) + 'ms'
-print("The result of Encryption is:\t" + ret)
+print("The result of Decryption is:\t" + ret)
 print('Decryption:\t' + use_time)
 
 print('--------------------------------------------------------------------------')
@@ -50,3 +50,4 @@ Verify_Time_End = time.time()
 use_time = str((Verify_Time_End - Verify_Time_Start) * 1000 / Loop) + 'ms'
 print("The result of Verify is:\t" + Beauty_Show_Hex(ret))
 print('Verify:\t' + use_time)
+

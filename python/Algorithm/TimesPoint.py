@@ -16,38 +16,34 @@ def BinaryExpansion(k, P: Point):
 def AddSub(k, P: Point):
     if type(k) == str:
         k = int(k, 16)
-    bin_3k = bin(3 * k).replace('0b', '')
-    bin_k = bin(k).replace('0b', '')
-    len_bin_3k = len(bin_3k)
-    len_bin_k = len(bin_k)
-    bin_k = '0' * (len_bin_3k - len_bin_k) + bin_k
+    third_k = 3 * k
+    len_bin_3k = third_k.bit_length()
     Q = P
-    for i in range(1, len_bin_3k - 1):
+    for i in range(len_bin_3k - 2, 0, -1):
         Q = Q + Q
-        if bin_3k[i] == '1' and bin_k[i] == '0':
+        if third_k & (1 << i) and k & (1 << i) == 0:
             Q = Q + P
-        elif bin_3k[i] == '0' and bin_k[i] == '1':
+        elif third_k & (1 << i) == 0 and k & (1 << i):
             Q = Q - P
     return Q
 
 
-def SlideWindow(k, P: Point, r: int):
-    if type(k) == str:
-        k = int(k, 16)
-    # P1 P2 P3 P5 P7...
+def SlideWindowPreCalc(P: Point, w=4):
     preP = {}
-    bin_k = ''.join(reversed(bin(k).replace('0b', '')))
-    l = len(bin_k)
-    # 预计算
-    # a)
     P1 = P
     P2 = P + P
     preP['1'] = P1
     preP['2'] = P2
-    # b)
-    for i in range(1, 2 ** (r - 1)):
-        preP[str(2*i+1)] = preP[str(2*i-1)] + preP['2']
-    # c)
+    for i in range(1, 2 ** (w - 1)):
+        preP[str(2 * i + 1)] = preP[str(2 * i - 1)] + preP['2']
+    return preP
+
+
+def SlideWindow(k, preP: dict, w: int = 4):
+    if type(k) == str:
+        k = int(k, 16)
+    bin_k = ''.join(reversed(bin(k).replace('0b', '')))
+    l = len(bin_k)
     j = l - 1
     Q = AdditiveIdentityElement()
     while j >= 0:
@@ -55,39 +51,45 @@ def SlideWindow(k, P: Point, r: int):
             Q = Q + Q
             j -= 1
         else:
-            t = j + 1 - r
-            while bin_k[t] != '1':
+            t = j + 1 - w
+            while bin_k[t] != '1' or t < 0:
                 t += 1
             hj = 0
             for i in range(j - t + 1):
-                hj += int(bin_k[t + i]) * 2 ** i
-            addQ = AdditiveIdentityElement()
-            for i in range(2 ** (j - t + 1)):
-                addQ += Q
+                hj += int(bin_k[t + i]) << i
+            addQ = Q
+            for i in range(j - t + 1):
+                addQ = addQ + addQ
             addP = preP[str(hj)]
             Q = addQ + addP
             j = t - 1
     return Q
 
 
-# import time
-#
-# p = "8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3"
-# k = '6CB28D99385C175C94F94E934817663FC176D925DD72B727260DBAAE1FB2F96F'
-# testP = Point("421DEBD61B62EAB6746434EBC3CC315E32220B3BADD50BDC4C4E6C147FEDD43D", "0680512BCBB42C07D47349D2153B70C4E5D7FDFCBFA36EA1A85841B9E46E09A2", p, "787968B4FA32C3FD2417842E73BBFEFF2F3C848B6831D7E0EC65228B3937E498")
-#
-# start1 = time.time()
-# print(BinaryExpansion(k, testP))
-# end1 = time.time()
-#
-# start2 = time.time()
-# print(AddSub(k, testP))
-# end2 = time.time()
-#
-# start3 = time.time()
-# print(SlideWindow(k, testP, 2))
-# end3 = time.time()
-#
-# print("BinaryExpansion:" + str(end1 - start1))
-# print("AddSub:" + str(end2 - start2))
-# print("SlideWindow:" + str(end3 - start3))
+if __name__ == "__main__":
+    import time
+
+    p = "FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF 00000000 FFFFFFFF FFFFFFFF".replace(' ', '')
+    k = "59276E27 D506861A 16680F3A D9C02DCC EF3CC1FA 3CDBE4CE 6D54B80D EAC1BC21".replace(' ', '')
+    a = "FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF 00000000 FFFFFFFF FFFFFFFC".replace(' ', '')
+    xg = "32C4AE2C 1F198119 5F990446 6A39C994 8FE30BBF F2660BE1 715A4589 334C74C7".replace(' ', '')
+    yg = "BC3736A2 F4F6779C 59BDCEE3 6B692153 D0A9877C C62A4740 02DF32E5 2139F0A0".replace(' ', '')
+    testP = Point(xg, yg, p, a)
+
+    start1 = time.time()
+    print(BinaryExpansion(k, testP))
+    end1 = time.time()
+
+    start2 = time.time()
+    print(AddSub(k, testP))
+    end2 = time.time()
+
+    window_r = 4
+    preP = SlideWindowPreCalc(testP, window_r)
+    start3 = time.time()
+    print(SlideWindow(k, preP, window_r))
+    end3 = time.time()
+
+    print("BinaryExpansion:" + str(end1 - start1))
+    print("AddSub:" + str(end2 - start2))
+    print("SlideWindow:" + str(end3 - start3))

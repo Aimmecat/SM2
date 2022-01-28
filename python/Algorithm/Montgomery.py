@@ -1,4 +1,3 @@
-
 """
     蒙哥马利预计算：高位相减法快速求 a mod p
 """
@@ -35,6 +34,7 @@ def RapidMod(a: int, p: int):
     蒙哥马利预计算：快速模乘 a * b mod p
 """
 
+
 def RapidMultiplyMod(a: int, b: int, p: int):
     _, a = RapidMod(a, p)
     _, b = RapidMod(b, p)
@@ -50,6 +50,7 @@ def RapidMultiplyMod(a: int, b: int, p: int):
 """
     快速模幂： a ** b mod p
 """
+
 
 def RapidPowerMod(a: int, b: int, p: int):
     _, a = RapidMod(a, p)
@@ -76,16 +77,29 @@ def RapidPowerMod(a: int, b: int, p: int):
 """
 
 
-def ExitEuclidean(a: int, p: int):
+def ExitEuclidean(a: int, p: int, label=None):
     if p == 0:
         return 0
-    y_last, r_last = 0, a
-    y_now, r_now = 1, p
+    x_last, x_now = (1, 0) if label is None else (0, 1)
+    r_last, r_now = a, p
     while r_now != 0:
-        q, c = RapidMod(r_last, r_now)
-        r_last, r_now = r_now, c
-        y_last, y_now = y_now, y_last - q * y_now
-    return y_last
+        # q, c = RapidMod(r_last, r_now)
+        # r_last, r_now = r_now, c
+        q = r_last // r_now
+        r_last, r_now = r_now, r_last - q * r_now
+        x_last, x_now = x_now, x_last - q * x_now
+    return x_last
+
+
+"""
+    求解 a^-1 mod p
+"""
+
+
+def RapidInverseMod(a: int, p: int, r: int, r1: int, _n: int):
+    a = MontgomeryMod(a, p, r, r1, _n)
+    x = ExitEuclidean(a, p)
+    return MontgomeryMod(x, p, r, r1, _n)
 
 
 """
@@ -99,6 +113,7 @@ def ExitEuclidean(a: int, p: int):
             _n: N'
 """
 
+
 def MontgomeryPreCalculate(n: int, max_bit=512):
     lens = n.bit_length()
     r_len = (lens + 7) // 8 * 8
@@ -107,7 +122,7 @@ def MontgomeryPreCalculate(n: int, max_bit=512):
     r = 2 ** r_len
     _, r1 = RapidMod(r, n)
     r2 = RapidMultiplyMod(r1, r1, n)
-    y = ExitEuclidean(r, n)
+    y = ExitEuclidean(r, n, 'Pre')
     _, _n = RapidMod(-y, r)
     return r, r1, r2, _n
 
@@ -122,6 +137,7 @@ def MontgomeryPreCalculate(n: int, max_bit=512):
     Output:
             x mod n
 """
+
 
 def MontgomeryReduction(x: int, n: int, r: int, _n: int):
     r_bit_len = r.bit_length() - 1
@@ -144,6 +160,7 @@ def MontgomeryReduction(x: int, n: int, r: int, _n: int):
             a mod p
 """
 
+
 def MontgomeryMod(a: int, n: int, r: int, r1: int, _n: int):
     return MontgomeryReduction(a * r1, n, r, _n)
 
@@ -160,6 +177,7 @@ def MontgomeryMod(a: int, n: int, r: int, r1: int, _n: int):
     Output:
             a * b mod p
 """
+
 
 def MontgomeryMultiplyMod(a: int, b: int, n: int, r: int, r2: int, _n: int):
     ar = MontgomeryReduction(a * r2, n, r, _n)
@@ -181,6 +199,7 @@ def MontgomeryMultiplyMod(a: int, b: int, n: int, r: int, r2: int, _n: int):
             a ** b mod p
 """
 
+
 def MontgomeryExpMod(a: int, b: int, n: int, r: int, r2: int, _n: int):
     rs = 1
     b_len = b.bit_length()
@@ -189,3 +208,58 @@ def MontgomeryExpMod(a: int, b: int, n: int, r: int, r2: int, _n: int):
         if b & (1 << bit):
             rs = MontgomeryMultiplyMod(rs, a, n, r, r2, _n)
     return rs
+
+
+"""
+    蒙哥马利模除
+    Input:
+            a:   number a
+            b:   number b
+            n:   取模数
+            r:   R
+            r2:  R * R mod p
+            _n:  N'
+    Output:
+            a / b mod p
+"""
+
+
+def MontgomeryDivisionMod(a: int, b: int, n: int, r: int, r1: int, r2: int, _n: int):
+    b = RapidInverseMod(b, n, r, r1, _n)
+    ar = MontgomeryReduction(a * r2, n, r, _n)
+    br = MontgomeryReduction(b * r2, n, r, _n)
+    abr = MontgomeryReduction(ar * br, n, r, _n)
+    return MontgomeryReduction(abr, n, r, _n)
+
+
+"""
+    蒙哥马利模除2
+    Input:
+            a:   number a
+            b:   number b
+            n:   取模数
+            r:   R
+            r2:  R * R mod p
+            _n:  N'
+    Output:
+            a / b mod p
+"""
+
+
+def MontgomeryDivisionMod2(a: int, b: int, n: int, r: int, r1: int, r2: int, _n: int):
+    numerator = MontgomeryMod(a, n, r, r1, _n)
+    denominator = MontgomeryExpMod(b, n - 2, n, r, r2, _n)
+    return MontgomeryMod(numerator * denominator, n, r, r1, _n)
+
+
+# r, r1, r2, _n = MontgomeryPreCalculate(int("FFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFF", 16), 256)
+# print(r)
+# print(r1)
+# print(r2)
+# print(_n)
+
+# r, r1, r2, _n = MontgomeryPreCalculate(int("FFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFF7203DF6B21C6052B53BBF40939D54123", 16), 512)
+# print(r)
+# print(r1)
+# print(r2)
+# print(_n)
