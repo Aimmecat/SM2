@@ -24,3 +24,6 @@ The implementation of SM2
 签名：33.11ms
 
 验证：42.89ms
+
+2.2
+完成二进制矩阵扩展欧几里得算法
