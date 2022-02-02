@@ -1,3 +1,5 @@
+import numpy as np
+
 """
     蒙哥马利预计算：高位相减法快速求 a mod p
 """
@@ -73,22 +75,128 @@ def RapidPowerMod(a: int, b: int, p: int):
         x(i+1) = x(i-1) - q(i) * x(i)
         y(i+1) = y(i-1) - q(i) * y(i)
         r(i+1) = r(i-1) - q(i) * r(i)
-        q(i)   = ceil(r(i-1) / r(i))
+        q(i)   = floor(r(i-1) / r(i))
 """
 
 
-def ExitEuclidean(a: int, p: int, label=None):
+def ExitEuclidean(a: int, p: int):
     if p == 0:
         return 0
-    x_last, x_now = (1, 0) if label is None else (0, 1)
-    r_last, r_now = a, p
+    x_last, x_now = 0, 1
+    r_last, r_now = p, a
     while r_now != 0:
         # q, c = RapidMod(r_last, r_now)
         # r_last, r_now = r_now, c
         q = r_last // r_now
         r_last, r_now = r_now, r_last - q * r_now
         x_last, x_now = x_now, x_last - q * x_now
+    if x_last < 0:
+        x_last += p
     return x_last
+
+
+"""
+    二进制扩展欧几里得
+    a < p and gcd(a, p) = 1
+    when a, p both odd:
+        gcd(a, p) = gcd( (p - a) / 2, a ) = 1
+        
+        1) a > (p - a) / 2:
+            F(a, p) ---> F( (p - a) / 2, a ) then
+                x = -1/2 * x'  + y'
+                y = 1/2 * x' 
+                need x' to be even
+                
+                x    | -1/2  1 |  x'
+                   = |         |
+                y    |  1/2  0 |  y'
+                
+        2) a < (p - a) / 2:
+            F(a, p) ---> F( a, (p - a) / 2 ) then
+                x = x' - 1/2 * y' 
+                y = 1/2 * y'
+                need y' to be even
+                
+                x    | 1  -1/2 |  x'
+                   = |         |
+                y    | 0   1/2 |  y'
+        
+    when a is even, p is odd
+        gcd(a, p) = gcd( a / 2, p ) = 1
+        
+            F(a, p) ---> F( a / 2, p ) then
+                x = 1 / 2 * x'
+                y = y'
+                need x' to be even
+                
+                x    | 1/2   0 |  x'
+                   = |         |
+                y    | 0     1 |  y'
+                
+        
+    when a is odd, p is even
+        gcd(a, p) = gcd( a ,p / 2 ) = 1
+        
+        1) a > p / 2:
+            F(a, p) ---> F( p / 2, a ) then
+                x = y' 
+                y = 1/2 * x' 
+                need x' to be even
+                
+                x    |  0    1 |  x'
+                   = |         |
+                y    |  1/2  0 |  y'
+                
+        2) a < p / 2:
+            F(a, p) ---> F( a, p / 2 ) then
+                x = x'
+                y = 1/2 * y'
+                need y' to be even
+                
+                x    | 1     0 |  x'
+                   = |         |
+                y    | 0   1/2 |  y'
+        
+"""
+def BExitEuclidean(a: int, p: int) -> int:
+    init_p = p
+    cnt = 0
+    a00, a01 = 1, 0
+    while a != 1:
+        flag_a = a & 1
+        flag_p = p & 1
+        if flag_a and flag_p:
+            num = (p - a) >> 1
+            if a < num:
+                p = num
+                # [2, -1], [0, 1]
+                a00, a01 = a00 << 1, a01 - a00
+            else:
+                a, p = num, a
+                # [-1, 2], [1, 0]
+                a00, a01 = a01 - a00, a00 << 1
+        elif flag_a:
+            num = p >> 1
+            if a < num:
+                p = num
+                # [2, 0], [0, 1]
+                a00 = a00 << 1
+            else:
+                a, p = num, a
+                # [0, 2], [1, 0]
+                a00, a01 = a01, a00 << 1
+        elif flag_p:
+            a = a >> 1
+            # [1, 0], [0, 2]
+            a01 = a01 << 1
+        cnt += 1
+    s = a00
+    for i in range(cnt):
+        if s & 1 == 0:
+            s >>= 1
+        else:
+            s = (s + init_p) >> 1
+    return s
 
 
 """
@@ -97,9 +205,33 @@ def ExitEuclidean(a: int, p: int, label=None):
 
 
 def RapidInverseMod(a: int, p: int, r: int, r1: int, _n: int):
-    a = MontgomeryMod(a, p, r, r1, _n)
+    _, a = RapidMod(a, p)
     x = ExitEuclidean(a, p)
-    return MontgomeryMod(x, p, r, r1, _n)
+    return RapidMod(x, p)[1]
+
+
+def RapidInverseMod2(a: int, p: int):
+    u, v, x1, x2, k = a, p, 1, 0, 0
+    while v > 0:
+        if v & 1 == 0:
+            v >>= 1
+            x1 <<= 1
+        elif u & 1 == 0:
+            u >>= 1
+            x2 <<= 1
+        elif v >= u:
+            v = (v - u) >> 1
+            x2 = x2 + x1
+            x1 <<= 1
+        else:
+            u = (u - v) >> 1
+            x1 = x2 + x1
+            x2 <<= 1
+        k += 1
+    assert u == 1
+    if x1 > p:
+        x1 = x1 - p
+    return x1, k
 
 
 """
@@ -122,8 +254,8 @@ def MontgomeryPreCalculate(n: int, max_bit=512):
     r = 2 ** r_len
     _, r1 = RapidMod(r, n)
     r2 = RapidMultiplyMod(r1, r1, n)
-    y = ExitEuclidean(r, n, 'Pre')
-    _, _n = RapidMod(-y, r)
+    x = ExitEuclidean(n, r)
+    _, _n = RapidMod(-x, r)
     return r, r1, r2, _n
 
 
@@ -246,20 +378,63 @@ def MontgomeryDivisionMod(a: int, b: int, n: int, r: int, r1: int, r2: int, _n: 
 """
 
 
-def MontgomeryDivisionMod2(a: int, b: int, n: int, r: int, r1: int, r2: int, _n: int):
-    numerator = MontgomeryMod(a, n, r, r1, _n)
-    denominator = MontgomeryExpMod(b, n - 2, n, r, r2, _n)
-    return MontgomeryMod(numerator * denominator, n, r, r1, _n)
+def MontgomeryDivisionMod2(a: int, b: int, n: int, r: int, r2: int, _n: int):
+    ar = MontgomeryReduction(a * r2, n, r, _n)
+    br = MontgomeryReduction(b * r2, n, r, _n)
+    x, k = RapidInverseMod2(br, n)
+    x = MontgomeryReduction(x * r2, n, r, _n)
+    x = MontgomeryReduction(x * (r << r.bit_length() - 1 >> k), n, r, _n)
+    abr = MontgomeryReduction(ar * x, n, r, _n)
+    return MontgomeryReduction(abr, n, r, _n)
 
 
-# r, r1, r2, _n = MontgomeryPreCalculate(int("FFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFF", 16), 256)
-# print(r)
-# print(r1)
-# print(r2)
-# print(_n)
+test_n = "FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF 7203DF6B 21C6052B 53BBF409 39D54123".replace(' ', '')
+test_p = "FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF 00000000 FFFFFFFF FFFFFFF1".replace(' ', '')
 
-# r, r1, r2, _n = MontgomeryPreCalculate(int("FFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFF7203DF6B21C6052B53BBF40939D54123", 16), 512)
-# print(r)
-# print(r1)
-# print(r2)
-# print(_n)
+if __name__ == "__main__":
+    # r, r1, r2, _n = MontgomeryPreCalculate(int(test_p, 16), 256)
+    # r, r1, r2, _n = MontgomeryPreCalculate(int(test_n, 16), 256)
+    # print(r)
+    # print(r1)
+    # print(r2)
+    # print(_n)
+
+    # a = 1
+    # b = 23
+    # n = 97
+    # r, r1, r2, _n = MontgomeryPreCalculate(n, 12)
+    #
+    # print(MontgomeryDivisionMod(a, b, n, r, r1, r2, _n))
+    # print(MontgomeryDivisionMod2(a, b, n, r, r2, _n))
+    # x, k = RapidInverseMod2(b, n)
+    # print(x, k)
+    # print(MontgomeryDivisionMod(2 ** k, b, n, r, r1, r2, _n))
+    # print(MontgomeryDivisionMod2(a, b, n, r, r2, _n))
+
+    import math
+
+    a = int(test_n, 16)
+    p = int(test_p, 16)
+
+    print(math.gcd(a, p))
+    assert math.gcd(a, p) == 1
+
+    import time as t
+
+    t1 = t.time()
+    for i in range(1000):
+        ExitEuclidean(a, p)
+    t2 = t.time()
+
+    ret1 = ExitEuclidean(a, p)
+    print(ret1)
+
+    t3 = t.time()
+    for i in range(1000):
+        BExitEuclidean(a, p)
+    t4 = t.time()
+
+    ret2 = BExitEuclidean(a, p)
+    print(ret2)
+    print((t4 - t3) / (t2 - t1))
+    assert ret1 == ret2
