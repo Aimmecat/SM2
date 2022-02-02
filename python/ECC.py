@@ -123,12 +123,14 @@ def SlideWindow(k, preP: dict, w: int = 4):
     j = l - 1
     Q = AdditiveIdentityElement()
     while j >= 0:
-        if bin_k[j] == '0':
+        if k & (1 << j) == 0:
             Q = Q + Q
             j -= 1
         else:
             t = j + 1 - w
-            while bin_k[t] != '1' or t < 0:
+            while t < 0:
+                t += 1
+            while k & (1 << t) == 0:
                 t += 1
             hj = 0
             for i in range(j - t + 1):

@@ -25,7 +25,7 @@ if __name__ == "__main__":
     n = int('8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3', 16)
 
     # 蒙哥马利预计算
-    r, r1, r2, _n = mg.MontgomeryPreCalculate(n, 256)
+    r, r1, r2, _n = mg.MontgomeryPreCalculate(n, 512)
 
     print("----------------------------------------------------------------")
     print('a mod n')
@@ -111,10 +111,18 @@ if __name__ == "__main__":
         ret1.append(mg.MontgomeryDivisionMod(a[idx], b[idx], n, r, r1, r2, _n))
     t4 = t.time()
 
-    print('Montgomery method use time \t:' + str((t4 - t3) * 1000 / l) + 'ms')
+    print('Montgomery method1 use time\t:' + str((t4 - t3) * 1000 / l) + 'ms')
+
+    t5 = t.time()
+    for idx in range(l):
+        ret2.append(mg.MontgomeryDivisionMod2(a[idx], b[idx], n, r,  r2, _n))
+    t6 = t.time()
+
+    print('Montgomery method2 use time\t:' + str((t6 - t5) * 1000 / l) + 'ms')
 
     print('The result of Rapid method is ' + str(ret == ret1))
-    print('The result of Montgomery method is ' + str(ret == ret1))
+    print('The result of Montgomery method1 is ' + str(ret == ret1))
+    print('The result of Montgomery method2 is ' + str(ret == ret2))
 
     # print("----------------------------------------------------------------")
     # print('a ** b mod n')
