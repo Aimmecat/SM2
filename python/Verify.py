@@ -23,8 +23,8 @@ def CreateSM2Verify(r, s, xa, ya, m):
     r = hex(r).replace('0x', '').upper()
     return r
 
-def CreateSM2VerifyTime():
-    ret = CreateSM2Verify(r=R, s=S, xa=xa, ya=ya, m=M)
+def CreateSM2VerifyTime(receiveR, receiveS):
+    ret = CreateSM2Verify(r=receiveR, s=receiveS, xa=xa, ya=ya, m=M)
     return ret
 
 
