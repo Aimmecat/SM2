@@ -1,4 +1,5 @@
 import Algorithm.Montgomery as mg
+import Utils.JacobiPoint as jp
 
 
 class Point(object):
@@ -9,6 +10,10 @@ class Point(object):
     r1 = 26959946667150639794667015087019630673716372585036390074623444647937
     r2 = 107839786681156762650902923513421286826326218306071004709145723011075
     _n = 115792089129476408767522629297870205758541517347941659817034995947026826395649
+    # r = 256
+    # r1 = 9
+    # r2 = 5
+    # _n = 229
 
     def __init__(self, x, y, p, a='1', value='1'):
         self.x = int(x, 16)
@@ -16,6 +21,10 @@ class Point(object):
         self.p = int(p, 16)
         self.a = int(a, 16)
         self.value = int(value, 16)
+
+        self.jacobi_x = int(x, 16)
+        self.jacobi_y = int(y, 16)
+        self.jacobi_z = 1
 
     def __str__(self):
         return "Point(" + hex(self.x).replace('0x', '').upper() + "," + hex(self.y).replace('0x', '').upper() + ")"
@@ -26,20 +35,8 @@ class Point(object):
         if type(self) == Point and type(other) == Point:
             denominator = self.x - other.x
             if denominator != 0:
-                numerator = self.y - other.y
-                lambdas = mg.MontgomeryDivisionMod(numerator, denominator, self.p, self.r, self.r1, self.r2, self._n)
-            else:
-                numerator = 3 * self.x * self.x + self.a
-                denominator = 2 * self.y
-                lambdas = mg.MontgomeryDivisionMod(numerator, denominator, self.p, self.r, self.r1, self.r2, self._n)
-            new_x = (lambdas * lambdas - self.x - other.x) % self.p
-            new_y = (lambdas * (self.x - new_x) - self.y) % self.p
-            new_x = hex(new_x).replace('0x', '')
-            new_y = hex(new_y).replace('0x', '')
-            p = hex(self.p).replace('0x', '')
-            a = hex(self.a).replace('0x', '')
-            value = hex(self.value + other.value).replace('0x', '')
-            return Point(new_x, new_y, p, a, value)
+                return AffineAddPoint(self, other)
+            return AffineTimesPoint(self)
         else:
             new_x = hex(self.x).replace('0x', '')
             new_y = hex(self.y).replace('0x', '')
@@ -85,8 +82,12 @@ class Point(object):
         return ret
 
     def PointMultiply(self, k):
-        preP = SlideWindowPreCalc(self)
-        return SlideWindow(k, preP)
+        # preP = SlideWindowPreCalc(self)
+        # return SlideWindow(k, preP)
+        jacobi_point = jp.JacobiPoint(self.x, self.y, 1, self.p, self.a)
+        jacobi_preP  = jp.JacobiSlideWindowPreCalcPlus(jacobi_point)
+        new_x, new_y, p, a, value = jp.JacobiSlideWindowPlus(k, jacobi_preP)
+        return Point(new_x, new_y, p, a, value)
 
 
 class AdditiveIdentityElement(Point):
@@ -142,6 +143,32 @@ def SlideWindow(k, preP: dict, w: int = 4):
             Q = addQ + addP
             j = t - 1
     return Q
+
+def AffineAddPoint(P: Point, Q: Point):
+    numerator = P.y - Q.y
+    denominator = P.x - Q.x
+    lambdas = mg.MontgomeryDivisionMod(numerator, denominator, P.p, P.r, P.r1, P.r2, P._n)
+    new_x = (lambdas * lambdas - P.x - Q.x) % P.p
+    new_y = (lambdas * (P.x - new_x) - P.y) % P.p
+    new_x = hex(new_x).replace('0x', '')
+    new_y = hex(new_y).replace('0x', '')
+    p = hex(P.p).replace('0x', '')
+    a = hex(P.a).replace('0x', '')
+    value = hex(P.value + P.value).replace('0x', '')
+    return Point(new_x, new_y, p, a, value)
+
+def AffineTimesPoint(P: Point):
+    numerator = 3 * P.x * P.x + P.a
+    denominator = 2 * P.y
+    lambdas = mg.MontgomeryDivisionMod(numerator, denominator, P.p, P.r, P.r1, P.r2, P._n)
+    new_x = (lambdas * lambdas - (P.x << 1) ) % P.p
+    new_y = (lambdas * (P.x - new_x) - P.y) % P.p
+    new_x = hex(new_x).replace('0x', '')
+    new_y = hex(new_y).replace('0x', '')
+    p = hex(P.p).replace('0x', '')
+    a = hex(P.a).replace('0x', '')
+    value = hex(P.value + P.value).replace('0x', '')
+    return Point(new_x, new_y, p, a, value)
 
 
 # p = '13'

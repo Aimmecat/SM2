@@ -1,5 +1,6 @@
 from ECC import Point, AdditiveIdentityElement
-
+from Utils.JacobiPoint import JacobiPoint, JacobiAdditiveIdentityElement
+import math
 
 def BinaryExpansion(k, P: Point):
     if type(k) == str:
@@ -67,6 +68,77 @@ def SlideWindow(k, preP: dict, w: int = 4):
             j = t - 1
     return Q
 
+def SlideWindowPreCalcPlus(P: Point, w=4):
+    prePP = {}
+    P1 = P
+    P2 = P + P
+    prePP['1'] = P1
+    prePP['2'] = P2
+    for i in range(1, 2 ** w):
+        prePP[str(i + 1)] = prePP[str(i)] + prePP['1']
+    return prePP
+
+def SlideWindowPlus(k, preP: dict, w: int = 4):
+    if type(k) == str:
+        k = int(k, 16)
+    bin_k = bin(k).replace('0b', '')
+    l = len(bin_k)
+    bin_k = '0' * (math.ceil(l / 4) * 4 - l) + bin_k
+    bin_k = ''.join(reversed(bin_k))
+    l = len(bin_k)
+    r = l // 4
+    j = r - 1
+    Q = AdditiveIdentityElement()
+    while j >= 0:
+        Q = Q + Q
+        Q = Q + Q
+        Q = Q + Q
+        Q = Q + Q
+        t = 0
+        for i in range(4):
+            t += int(bin_k[4 * j + i]) << i
+        if t != 0:
+            Q += preP[str(t)]
+        j -= 1
+    return Q
+
+##########################################################
+def JacobiSlideWindowPreCalcPlus(P: JacobiPoint, w=4):
+    jacobi_preP = {}
+    P1 = P
+    P2 = P + P
+    jacobi_preP['1'] = P1
+    jacobi_preP['2'] = P2
+    for i in range(1, 2 ** w):
+        jacobi_preP[str(i + 1)] = jacobi_preP[str(i)] + jacobi_preP['1']
+    return jacobi_preP
+
+def JacobiSlideWindowPlus(k, preP: dict, w: int = 4):
+    if type(k) == str:
+        k = int(k, 16)
+    bin_k = bin(k).replace('0b', '')
+    l = len(bin_k)
+    bin_k = '0' * (math.ceil(l / 4) * 4 - l) + bin_k
+    bin_k = ''.join(reversed(bin_k))
+    l = len(bin_k)
+    r = l // 4
+    j = r - 1
+    Q = JacobiAdditiveIdentityElement()
+    while j >= 0:
+        Q = Q + Q
+        Q = Q + Q
+        Q = Q + Q
+        Q = Q + Q
+        t = 0
+        for i in range(4):
+            t += int(bin_k[4 * j + i]) << i
+        if t != 0:
+            Q += preP[str(t)]
+        j -= 1
+    return Q.Trance2Point()
+##########################################################
+
+
 
 if __name__ == "__main__":
     import time
@@ -92,6 +164,19 @@ if __name__ == "__main__":
     print(SlideWindow(k, preP, window_r))
     end3 = time.time()
 
+    prePP = SlideWindowPreCalcPlus(testP, window_r)
+    start4 = time.time()
+    print(SlideWindowPlus(k, prePP, window_r))
+    end4 = time.time()
+
+    testP = JacobiPoint(int(xg, 16), int(yg, 16), 1, int(p, 16), int(a, 16))
+    jacobi_preP = JacobiSlideWindowPreCalcPlus(testP, window_r)
+    start5 = time.time()
+    print(JacobiSlideWindowPlus(k, jacobi_preP, window_r))
+    end6 = time.time()
+
     print("BinaryExpansion:" + str(end1 - start1))
     print("AddSub:" + str(end2 - start2))
     print("SlideWindow:" + str(end3 - start3))
+    print("SlideWindowPlus:" + str(end4 - start4))
+    print("JacobiSlideWindowPlus:" + str(end6 - start5))

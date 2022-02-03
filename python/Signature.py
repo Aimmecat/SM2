@@ -3,6 +3,7 @@ from SM2 import GetSM2Parameter, GetK
 import Utils.TransformData as tf
 from ECC import Point
 import Algorithm.Montgomery as mg
+import cProfile
 
 ENTLa = "0080"
 m = "message digest"
@@ -16,6 +17,8 @@ r1 = 26959946667150639794667015087208360940682819471613774651619690594013
 r2 = 13890758876747366292380987140861871730726264343299237038422391206777195679520
 _n = 50307568889517732031517334307777217170252470892231192406845782083964144781685
 
+preZa = 'B2E14C5C79C6DF5B85F4FE7ED8DB7A262B9DA7E07CCB0EA9F4747B8CCDA8A4F3'
+
 
 def CreatSM2Signature(IDa, ENTLa, message, xa, ya, dA):
     # 获取参数
@@ -23,7 +26,8 @@ def CreatSM2Signature(IDa, ENTLa, message, xa, ya, dA):
     # 生成摘要
     total_m = ENTLa + IDa + a + b + xg + yg + xa + ya
     sm3 = SM3()
-    Za = sm3.CreateHv(total_m)
+    # Za = sm3.CreateHv(total_m)
+    Za = preZa
     ascii_m = tf.Trans_AsciiEncode(message)
     M = Za + ascii_m
     # 密码杂凑函数值
@@ -50,3 +54,17 @@ def CreatSM2SignatureTime():
                             ya=ya,
                             dA=dA)
     return ret
+
+
+def CreatSM2SignatureTime2():
+    for i in range(10):
+        CreatSM2Signature(IDa=IDa,
+                          ENTLa=ENTLa,
+                          message=m,
+                          xa=xa,
+                          ya=ya,
+                          dA=dA)
+
+
+if __name__ == "__main__":
+    cProfile.run("CreatSM2SignatureTime2()")
