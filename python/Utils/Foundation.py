@@ -10,7 +10,7 @@ class Register32(object):
 
     def __str__(self):
         return 'Hex:\t' + "'" + self.value.upper() + "'\t" + 'Type:' + str(self.TYPE) + 'bit' \
-               + '\tBin:' + self.GetBinDisplay()
+               + '\tBin:' + self.GetBinDisplay() + '\tValue:' + str(int(self.value.upper(), 16))
 
     __repr__ = __str__
 
@@ -29,17 +29,14 @@ class Register32(object):
 
     def __and__(self, other):
         value = hex(int(self.value, 16) & int(other.value, 16)).replace('0x', '')
-        value = (self.LEN - len(value)) * '0' + value
         return Register32(value)
 
     def __or__(self, other):
         value = hex(int(self.value, 16) | int(other.value, 16)).replace('0x', '')
-        value = (self.LEN - len(value)) * '0' + value
         return Register32(value)
 
     def __xor__(self, other):
         value = hex(int(self.value, 16) ^ int(other.value, 16)).replace('0x', '')
-        value = (self.LEN - len(value)) * '0' + value
         return Register32(value)
 
     def __eq__(self, other):
@@ -47,18 +44,16 @@ class Register32(object):
 
     def __lshift__(self, b):
         b %= self.TYPE
-        value = bin(int(self.value, 16)).replace('0b', '')
-        value = '0' * (self.TYPE - len(value)) + value
-        creat_value = hex(int(value[b:] + value[0:b], 2)).replace('0x', '')
-        creat_value = '0' * (self.LEN - len(creat_value)) + creat_value
+        value = int(self.value, 16)
+        creat_value = (value >> (self.TYPE - b)) | (value << b)
+        creat_value = hex(creat_value).replace('0x', '')
         return Register32(creat_value)
 
     def __rshift__(self, b):
         b %= self.TYPE
-        value = bin(int(self.value, 16)).replace('0b', '')
-        value = '0' * (self.TYPE - len(value)) + value
-        creat_value = hex(int(value[self.TYPE - b:] + value[0:self.TYPE - b], 2)).replace('0x', '')
-        creat_value = '0' * (self.LEN - len(creat_value)) + creat_value
+        value = int(self.value, 16)
+        creat_value = (value << (self.TYPE - b)) | (value >> b)
+        creat_value = hex(creat_value).replace('0x', '')
         return Register32(creat_value)
 
     def GetBinDisplay(self):

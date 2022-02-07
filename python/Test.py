@@ -5,7 +5,7 @@ from Signature import CreatSM2SignatureTime
 from Verify import CreateSM2VerifyTime
 from Utils.TransformData import Beauty_Show_Hex
 
-Loop = 10
+Loop = 20
 
 print('--------------------------------------------------------------------------')
 print("Encryption")
