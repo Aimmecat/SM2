@@ -10,7 +10,7 @@ import cProfile
 class SM3(object):
     DEBUG = False
 
-    def __init__(self, debug=False):
+    def __init__(self):
         # Init Register
         self.A = Register32('7380166F')
         self.B = Register32('4914b2b9')
@@ -25,9 +25,6 @@ class SM3(object):
         self.TT1 = Register32('00000000')
         self.TT2 = Register32('00000000')
         self.V = '7380166F4914b2b9172442d7da8a0600a96f30bc163138aae38dee4db0fb0e4e'
-
-        # Whether show debug info
-        self.DEBUG = debug
 
     def init(self):
         self.A = Register32('7380166F')
@@ -139,19 +136,18 @@ def Get_Message(m):
     This Demo is given by the SM3 standard 
 """
 
+loop = 1000
 m1 = '616263'
 m2 = '61626364616263646162636461626364616263646162636461626364616263646162636461626364616263646162636461626364616263646162636461626364'
 Test = SM3()
 
 
 def TestTimeConsume1():
-    start1 = 0.0
-    end1 = 0.0
     solve1 = None
-    for i in range(1000):
-        start1 = time.time()
+    start1 = time.time()
+    for i in range(loop):
         solve1 = Test.CreateHv(m1)
-        end1 = time.time()
+    end1 = time.time()
     print("Input 616263:")
     print("You should get:" + '66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0'.upper())
     print("You real   get:" + solve1)
@@ -160,13 +156,11 @@ def TestTimeConsume1():
 
 
 def TestTimeConsume2():
-    start2 = 0.0
-    end2 = 0.0
     solve2 = None
-    for i in range(1000):
-        start2 = time.time()
+    start2 = time.time()
+    for i in range(loop):
         solve2 = Test.CreateHv(m2)
-        end2 = time.time()
+    end2 = time.time()
     print(
         "Input 61626364616263646162636461626364616263646162636461626364616263646162636461626364616263646162636461626364616263646162636461626364:")
     print("You should get:" + "debe9ff92275b8a138604889c18e5a4d6fdb70e5387e5765293dcba39c0c5732".upper())
@@ -176,6 +170,8 @@ def TestTimeConsume2():
 
 
 if __name__ == "__main__":
-    cProfile.run("TestTimeConsume1()")
+    TestTimeConsume1()
+    # cProfile.run("TestTimeConsume1()")
     print('--------------------------------------------------------------------------------------------------')
-    cProfile.run("TestTimeConsume2()")
+    TestTimeConsume2()
+    # cProfile.run("TestTimeConsume2()")
