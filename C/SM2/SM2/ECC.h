@@ -26,6 +26,7 @@ Point* JacobiAddPoint(Point* P, Point* Q);
 Point* JacobiDoublePoint(Point* P);
 Point* JacobiSlideWindowPlus(char* k);
 void JacobiSlideWindowPlusPreCalc(Point* P);
+void FreePoint(Point* point);
 
 #endif // !_ECC_H_
 

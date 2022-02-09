@@ -7,6 +7,7 @@
 
 #define Int10(x)	(x - '0')
 #define Int16(x)	(x - 'A' + 10)
+#define Int(x)		((x) <= ('9') ? Int10(x) : Int16(x))
 
 typedef int						int32;
 typedef long long int			int64;

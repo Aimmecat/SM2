@@ -1,5 +1,6 @@
 #include "headfile.h"
 
+
 miracl* mip;
 
 char* BigAdd(char* num1, char* num2) {
@@ -70,7 +71,7 @@ char* BigAnd(char* num1, char* num2) {
 	cinstr(big_num1, num1);
 	cinstr(big_num2, num2);
 	mr_and(big_num1, big_num2, big_ret);
-	char* ret = (char*)calloc(max_len << 1, sizeof(char));
+	char* ret = (char*)calloc(2048, sizeof(char));
 	cotstr(big_ret, ret);
 	return ret;
 }
@@ -90,7 +91,7 @@ char* BigXor(char* num1, char* num2) {
 	cinstr(big_num1, num1);
 	cinstr(big_num2, num2);
 	mr_xor(big_num1, big_num2, big_ret);
-	char* ret = (char*)calloc(max_len << 1, sizeof(char));
+	char* ret = (char*)calloc(2048, sizeof(char));
 	cotstr(big_ret, ret);
 	return ret;
 }
@@ -127,7 +128,7 @@ char* BigCopy(char* num) {
 	big big_ret = mirvar(0);
 	cinstr(big_num, num);
 	copy(big_num, big_ret);
-	char* ret = (char*)calloc(len, sizeof(char));
+	char* ret = (char*)calloc(2048, sizeof(char));
 	cotstr(big_ret, ret);
 	return ret;
 }

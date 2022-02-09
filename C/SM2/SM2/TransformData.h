@@ -16,6 +16,8 @@ char* Substr(char* source, int start, int n);
 char* TransformInt2Hex(int num);
 char* TransformInt2HexByte(int num);
 char* Trans_AsciiEncode(char* m);
+void FreeString(String* string);
+char* Trans_AsciiDecode(char* m);
 
 #endif // !_TRANSFORMDATA_H_
 

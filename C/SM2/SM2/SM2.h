@@ -11,5 +11,6 @@ SignatureInfo* Signature(char* IDa, char* ENTLa, char* m, char* xa, char* ya, ch
 char* Verify(char* r, char* s, char* m, char* xa, char* ya);
 char* Encryption(char* m, char* xa, char* ya);
 char* Decryption(char* m, char* dA, int k_len);
+char* CreateC1(char* x, char* y);
 
 #endif // !_SM2_H_

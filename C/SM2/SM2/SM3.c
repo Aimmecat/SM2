@@ -88,7 +88,9 @@ char* CreateHv(String* m) {
 		char* tmp = TransformInt2HexByte(Register[i]);
 		strcat(m->hash, tmp);
 	}
-	return m->hash;
+	char* hash = (char*)calloc(2048, sizeof(char));
+	strcat(hash, m->hash);
+	return hash;
 }
 
 Register32 GetTj(int j) {

@@ -3,14 +3,33 @@
 char* IDa = "31323334353637383132333435363738";
 char* ENTLa = "0080";
 char* m = "message digest";
+char* M = "encryption standard";
 char* xa = "09F9DF311E5421A150DD7D161E4BC5C672179FAD1833FC076BB08FF356F35020";
 char* ya = "CCEA490CE26775A52DC6EA718CC1AA600AED05FBF35E084A6632F6072DA9AD13";
 char* dA = "3945208F7B2144B13F36E38AC6D39F95889393692860B51A42FB81EF4DF7C5B8";
 
+char* testR = "F5A03B0648D2C4630EEAC513E1BB81A15944DA3827D5B74143AC7EACEEE720B3";
+char* testS = "B1B6AA29DF212FD8763182BC0D421CA1BB9038FD1F7F42D4840B69C485BBC1AA";
+char* testM = "B2E14C5C79C6DF5B85F4FE7ED8DB7A262B9DA7E07CCB0EA9F4747B8CCDA8A4F36D65737361676520646967657374";
+char* testD = "0404EBFC718E8D1798620432268E77FEB6415E2EDE0E073C0F4F640ECD2E149A73E858F9D81E5430A57B36DAAB8F950A3C64E6EE6A63094D99283AFF767E124DF059983C18F809E262923C53AEC295D30383B54E39D609D160AFCB1908D0BD876621886CA989CA9C7D58087307CA93092D651EFA";
+
 int main()
 {
 	mip = mirsys(1000, 16);
-	Signature(IDa, ENTLa, m, xa, ya, dA);
+	//SignatureInfo* signature_ret = Signature(IDa, ENTLa, m, xa, ya, dA);
+	//printf("R:%s\n", signature_ret->SignatureR);
+	//printf("S:%s\n", signature_ret->SignatureS);
+
+	//char* verifyR = Verify(testR, testS, testM, xa, ya);
+	//printf("VerifyR:%s\n", verifyR);
+
+	//char* encryption = Encryption(M, xa, ya);
+	//printf("encryption:%s\n", encryption);
+
+	//char* decryption = Decryption(testD, dA, 152);
+	//printf("decryption:%s\n", decryption);
+	mirexit();
+
 	return 0;
 }
  

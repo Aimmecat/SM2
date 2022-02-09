@@ -11,6 +11,13 @@ Point* CreateNewPoint(char* axis_x, char* axis_y, char* axis_z, PointType point_
 	return new_point;
 }
 
+void FreePoint(Point* point) {
+	free(point->x);
+	free(point->y);
+	free(point->z);
+	free(point);
+}
+
 Point* JacobiAddPoint(Point* P, Point* Q) {
 	if (P->type == JacobiPoint and Q->type == JacobiPoint) {
 		char* lambda1 = MontgomeryMultiplyMod(P->x, MontgomeryExpMod(Q->z, 2, sm2_p, R_MASK, R2, _N), sm2_p, R_MASK, R2, _N);
@@ -58,20 +65,22 @@ Point* JacobiDoublePoint(Point* P) {
 
 void JacobiSlideWindowPlusPreCalc(Point* P) {
 	*PreCalcPoint = P;
-	for (int i = 1; i < PRE_CALC_LEN; ++i) {
-		*(PreCalcPoint + i) = JacobiAddPoint(P, *(PreCalcPoint + i - 1));
+	*(PreCalcPoint + 1) = JacobiDoublePoint(P);
+	for (int i = 1; i < PRE_CALC_LEN - 1; ++i) {
+		*(PreCalcPoint + i + 1) = JacobiAddPoint(P, *(PreCalcPoint + i));
 	}
 }
 
 Point* JacobiSlideWindowPlus(char* k) {
-	int j = strlen(k) - 1;
+	int length = strlen(k) - 1;
+	int j = length;
 	Point* Q = CreateNewPoint("0", "0", "0", AdditiveIdentityElement);
 	while (j >= 0) {
 		Q = JacobiDoublePoint(Q);
 		Q = JacobiDoublePoint(Q);
 		Q = JacobiDoublePoint(Q);
 		Q = JacobiDoublePoint(Q);
-		int t = k[j] <= '9' ? Int10(k[j]) : Int16(k[j]);
+		int t = k[length - j] - '9' <= 0 ? Int10(k[length - j]) : Int16(k[length - j]);
 		if (t != 0)
 			Q = JacobiAddPoint(Q, PreCalcPoint[t - 1]);
 		j--;

@@ -2,6 +2,8 @@
 
 String* NewString(char* data) {
 	String* string = malloc(sizeof(String));
+	string->data = (char*)calloc(2048, sizeof(char));
+	string->hash = (char*)calloc(2048, sizeof(char));
 	if (string != NULL) {
 		string->hex_length = strlen(data);
 		string->bit_length = string->hex_length << 2;
@@ -18,7 +20,6 @@ String* NewString(char* data) {
 		int align = (cnt << 7) - 1 - string->hex_length - cnt_length;
 
 		string->hex_length = (cnt << 7);
-		string->data = (char*)calloc(string->hex_length, sizeof(char));
 		strcat(string->data, data);
 		strcat(string->data, "8");
 		for (int i = 0; i < align; ++i) {
@@ -32,9 +33,15 @@ String* NewString(char* data) {
 			char* value = Substr(string->data, 8 * i, 8);
 			*(string->register_value + i) = TransformHex2Int(value);
 		}
-		string->hash = (char*)calloc(64, sizeof(char));
 	}
 	return string;
+}
+
+void FreeString(String* string) {
+	free(string->data);
+	free(string->hash);
+	free(string->register_value);
+	free(string);
 }
 
 
@@ -65,7 +72,7 @@ char* TransformInt2Hex(int num) {
 }
 
 char* TransformInt2HexByte(int num) {
-	char* ret = (char*)calloc(9, sizeof(char));
+	char* ret = (char*)calloc(16, sizeof(char));
 	char* symbol = "0123456789ABCDEF";
 	ret = ret + 8;
 	*(ret--) = '\0';
@@ -79,7 +86,7 @@ char* TransformInt2HexByte(int num) {
 }
 
 char* Substr(char* source, int start, int n) {
-	char* p = (char*) calloc(16, sizeof(char));
+	char* p = (char*) calloc(2048, sizeof(char));
 	char* ret = p;
 	char* q = source + start;
 	while (n--) {
@@ -91,11 +98,22 @@ char* Substr(char* source, int start, int n) {
 
 char* Trans_AsciiEncode(char* m) {
 	int length = strlen(m);
-	char* ascii_encode = (char*)calloc(length << 1 + 1, sizeof(char));
+	char* ascii_encode = (char*)calloc(2048, sizeof(char));
 	ascii_encode[length << 1] = '\0';
 	for (int i = 0; i < length; ++i) {
 		int num = *(m + i);
 		strcat(ascii_encode, TransformInt2Hex(num));
 	}
 	return ascii_encode;
+}
+
+char* Trans_AsciiDecode(char* m) {
+	int length = strlen(m) >> 1;
+	char* decode = (char*)calloc(2048, sizeof(char));
+	for (int i = 0; i < length; ++i) {
+		char symbol = (char)((Int(m[i << 1]) << 4) + (Int(m[1 + (i << 1)])));
+		*(decode + i) = symbol;
+	}
+	*(decode + strlen(m)) = '\0';
+	return decode;
 }
