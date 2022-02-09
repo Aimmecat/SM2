@@ -2,6 +2,8 @@
 
 String* NewString(char* data) {
 	String* string = malloc(sizeof(String));
+	string->data = (char*)calloc(2048, sizeof(char));
+	string->hash = (char*)calloc(2048, sizeof(char));
 	if (string != NULL) {
 		string->hex_length = strlen(data);
 		string->bit_length = string->hex_length << 2;
@@ -9,7 +11,6 @@ String* NewString(char* data) {
 		int cnt = 1;
 		while ((cnt << 7) <= string->hex_length)cnt++;
 		
-
 		// 计数要补的长度字符
 		int cnt_length = 1;
 		while ((1 << (cnt_length << 2)) <= string->bit_length)cnt_length++;
@@ -17,16 +18,13 @@ String* NewString(char* data) {
 
 		// 计算需要补的0的个数并生成对应字符串
 		int align = (cnt << 7) - 1 - string->hex_length - cnt_length;
-		char* align_zero = (char*)calloc(align, sizeof(char));
-		for (int i = 0; i < align; ++i) {
-			strcat(align_zero, "0");
-		}
 
 		string->hex_length = (cnt << 7);
-		string->data = (char*)calloc(string->hex_length, sizeof(char));
 		strcat(string->data, data);
 		strcat(string->data, "8");
-		strcat(string->data, align_zero);
+		for (int i = 0; i < align; ++i) {
+			strcat(string->data, "0");
+		}
 		strcat(string->data, hexlength);
 
 		int size = string->hex_length >> 3;
@@ -37,6 +35,13 @@ String* NewString(char* data) {
 		}
 	}
 	return string;
+}
+
+void FreeString(String* string) {
+	free(string->data);
+	free(string->hash);
+	free(string->register_value);
+	free(string);
 }
 
 
@@ -81,7 +86,7 @@ char* TransformInt2HexByte(int num) {
 }
 
 char* Substr(char* source, int start, int n) {
-	char* p = (char*) calloc(16, sizeof(char));
+	char* p = (char*) calloc(2048, sizeof(char));
 	char* ret = p;
 	char* q = source + start;
 	while (n--) {
@@ -89,4 +94,26 @@ char* Substr(char* source, int start, int n) {
 	}
 	*(p++) = '\0';
 	return ret;
+}
+
+char* Trans_AsciiEncode(char* m) {
+	int length = strlen(m);
+	char* ascii_encode = (char*)calloc(2048, sizeof(char));
+	ascii_encode[length << 1] = '\0';
+	for (int i = 0; i < length; ++i) {
+		int num = *(m + i);
+		strcat(ascii_encode, TransformInt2Hex(num));
+	}
+	return ascii_encode;
+}
+
+char* Trans_AsciiDecode(char* m) {
+	int length = strlen(m) >> 1;
+	char* decode = (char*)calloc(2048, sizeof(char));
+	for (int i = 0; i < length; ++i) {
+		char symbol = (char)((Int(m[i << 1]) << 4) + (Int(m[1 + (i << 1)])));
+		*(decode + i) = symbol;
+	}
+	*(decode + strlen(m)) = '\0';
+	return decode;
 }

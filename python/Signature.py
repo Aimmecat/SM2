@@ -26,7 +26,7 @@ def CreatSM2Signature(IDa, ENTLa, message, xa, ya, dA):
     # 生成摘要
     total_m = ENTLa + IDa + a + b + xg + yg + xa + ya
     sm3 = SM3()
-    # Za = sm3.CreateHv(total_m)
+    Za = sm3.CreateHv(total_m)
     Za = preZa
     ascii_m = tf.Trans_AsciiEncode(message)
     M = Za + ascii_m

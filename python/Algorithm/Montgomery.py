@@ -190,13 +190,12 @@ def BExitEuclidean(a: int, p: int) -> int:
             # [1, 0], [0, 2]
             a01 = a01 << 1
         cnt += 1
-    s = a00
     for i in range(cnt):
-        if s & 1 == 0:
-            s >>= 1
+        if a00 & 1 == 0:
+            a00 >>= 1
         else:
-            s = (s + init_p) >> 1
-    return s
+            a00 = (a00 + init_p) >> 1
+    return a00
 
 
 """
@@ -206,7 +205,7 @@ def BExitEuclidean(a: int, p: int) -> int:
 
 def RapidInverseMod(a: int, p: int, r: int, r1: int, _n: int):
     _, a = RapidMod(a, p)
-    x = ExitEuclidean(a, p)
+    x = BExitEuclidean(a, p)
     return RapidMod(x, p)[1]
 
 
@@ -389,10 +388,10 @@ def MontgomeryDivisionMod2(a: int, b: int, n: int, r: int, r2: int, _n: int):
 
 
 test_n = "FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF 7203DF6B 21C6052B 53BBF409 39D54123".replace(' ', '')
-test_p = "FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF 00000000 FFFFFFFF FFFFFFF1".replace(' ', '')
+test_p = "FFFFFFFE FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF 00000000 FFFFFFFF FFFFFFFF".replace(' ', '')
 
 if __name__ == "__main__":
-    # r, r1, r2, _n = MontgomeryPreCalculate(int(test_p, 16), 256)
+    r, r1, r2, _n = MontgomeryPreCalculate(int(test_p, 16), 256)
     # r, r1, r2, _n = MontgomeryPreCalculate(int(test_n, 16), 256)
     # print(r)
     # print(r1)
@@ -411,30 +410,41 @@ if __name__ == "__main__":
     # print(MontgomeryDivisionMod(2 ** k, b, n, r, r1, r2, _n))
     # print(MontgomeryDivisionMod2(a, b, n, r, r2, _n))
 
-    import math
+    # import math
+    #
+    # a = int(test_n, 16)
+    # p = int(test_p, 16)
+    #
+    # print(math.gcd(a, p))
+    # assert math.gcd(a, p) == 1
+    #
+    # import time as t
+    #
+    # t1 = t.time()
+    # for i in range(1000):
+    #     ExitEuclidean(a, p)
+    # t2 = t.time()
+    #
+    # ret1 = ExitEuclidean(a, p)
+    # print(ret1)
+    #
+    # t3 = t.time()
+    # for i in range(1000):
+    #     BExitEuclidean(a, p)
+    # t4 = t.time()
+    #
+    # ret2 = BExitEuclidean(a, p)
+    # print(ret2)
+    # print((t4 - t3) / (t2 - t1))
+    # assert ret1 == ret2
 
-    a = int(test_n, 16)
-    p = int(test_p, 16)
-
-    print(math.gcd(a, p))
-    assert math.gcd(a, p) == 1
-
-    import time as t
-
-    t1 = t.time()
-    for i in range(1000):
-        ExitEuclidean(a, p)
-    t2 = t.time()
-
-    ret1 = ExitEuclidean(a, p)
-    print(ret1)
-
-    t3 = t.time()
-    for i in range(1000):
-        BExitEuclidean(a, p)
-    t4 = t.time()
-
-    ret2 = BExitEuclidean(a, p)
-    print(ret2)
-    print((t4 - t3) / (t2 - t1))
-    assert ret1 == ret2
+    num1 = "38901280129789113687126868FFFCCCCC780908C7986C90C808C68A9879797A"
+    num2 = "908013280182047107FFF78799A989CBCC098A0C980A99C071BBCCAFFEEA121C"
+    num3 = "FFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFF"
+    value1 = int(num1, 16)
+    value2 = int(num2, 16)
+    value3 = int(num3, 16)
+    MontgomeryMod(value1, value2, r, r1, _n)
+    ret = MontgomeryMultiplyMod(value1, value2, value3, r, r2, _n)
+    ret2 = MontgomeryDivisionMod(value1, value2, value3, r, r1, r2, _n)
+    print(hex(ret2).replace('0x', '').upper())

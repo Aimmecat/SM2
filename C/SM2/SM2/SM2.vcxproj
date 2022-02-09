@@ -80,6 +80,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>miracl_x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>67108864</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -88,7 +89,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <AdditionalIncludeDirectories>./include</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <StackReserveSize>104857600</StackReserveSize>
+      <AdditionalDependencies>miracl_x86.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -119,15 +126,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BigUtil.c" />
+    <ClCompile Include="ECC.c" />
+    <ClCompile Include="KDF.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="Montgomery.c" />
+    <ClCompile Include="parameter.c" />
+    <ClCompile Include="SM2.c" />
     <ClCompile Include="SM3.c" />
     <ClCompile Include="TransformData.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BigUtil.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="ECC.h" />
     <ClInclude Include="headfile.h" />
+    <ClInclude Include="KDF.h" />
     <ClInclude Include="miracl.h" />
     <ClInclude Include="mirdef.h" />
+    <ClInclude Include="Montgomery.h" />
+    <ClInclude Include="parameter.h" />
+    <ClInclude Include="SM2.h" />
     <ClInclude Include="SM3.h" />
     <ClInclude Include="TransformData.h" />
   </ItemGroup>

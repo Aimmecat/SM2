@@ -24,6 +24,24 @@
     <ClCompile Include="TransformData.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="parameter.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="KDF.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BigUtil.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Montgomery.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ECC.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SM2.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headfile.h">
@@ -42,6 +60,24 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TransformData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="parameter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="KDF.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BigUtil.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Montgomery.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ECC.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SM2.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
