@@ -15,6 +15,7 @@ uint32 TransformHex2Int(char* hex);
 char* Substr(char* source, int start, int n);
 char* TransformInt2Hex(int num);
 char* TransformInt2HexByte(int num);
+char* Trans_AsciiEncode(char* m);
 
 #endif // !_TRANSFORMDATA_H_
 

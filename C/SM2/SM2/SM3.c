@@ -53,7 +53,7 @@ void CF(String* m, int idx) {
 	}
 }
 
-void CreateHv(String* m) {
+char* CreateHv(String* m) {
 	RegisterInit();
 	int length = m->hex_length >> 7;
 	Register32 last_A = TransformHex2Int("7380166F");
@@ -84,11 +84,11 @@ void CreateHv(String* m) {
 		last_G = Register[G];
 		last_H = Register[H];
 	}
-	m->hash = (char*)calloc(64, sizeof(char));
 	for (int i = 0; i < 8; ++i) {
 		char* tmp = TransformInt2HexByte(Register[i]);
 		strcat(m->hash, tmp);
 	}
+	return m->hash;
 }
 
 Register32 GetTj(int j) {

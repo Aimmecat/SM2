@@ -9,7 +9,6 @@ String* NewString(char* data) {
 		int cnt = 1;
 		while ((cnt << 7) <= string->hex_length)cnt++;
 		
-
 		// 计数要补的长度字符
 		int cnt_length = 1;
 		while ((1 << (cnt_length << 2)) <= string->bit_length)cnt_length++;
@@ -17,16 +16,14 @@ String* NewString(char* data) {
 
 		// 计算需要补的0的个数并生成对应字符串
 		int align = (cnt << 7) - 1 - string->hex_length - cnt_length;
-		char* align_zero = (char*)calloc(align, sizeof(char));
-		for (int i = 0; i < align; ++i) {
-			strcat(align_zero, "0");
-		}
 
 		string->hex_length = (cnt << 7);
 		string->data = (char*)calloc(string->hex_length, sizeof(char));
 		strcat(string->data, data);
 		strcat(string->data, "8");
-		strcat(string->data, align_zero);
+		for (int i = 0; i < align; ++i) {
+			strcat(string->data, "0");
+		}
 		strcat(string->data, hexlength);
 
 		int size = string->hex_length >> 3;
@@ -35,6 +32,7 @@ String* NewString(char* data) {
 			char* value = Substr(string->data, 8 * i, 8);
 			*(string->register_value + i) = TransformHex2Int(value);
 		}
+		string->hash = (char*)calloc(64, sizeof(char));
 	}
 	return string;
 }
@@ -67,7 +65,7 @@ char* TransformInt2Hex(int num) {
 }
 
 char* TransformInt2HexByte(int num) {
-	char* ret = (char*)calloc(16, sizeof(char));
+	char* ret = (char*)calloc(9, sizeof(char));
 	char* symbol = "0123456789ABCDEF";
 	ret = ret + 8;
 	*(ret--) = '\0';
@@ -89,4 +87,15 @@ char* Substr(char* source, int start, int n) {
 	}
 	*(p++) = '\0';
 	return ret;
+}
+
+char* Trans_AsciiEncode(char* m) {
+	int length = strlen(m);
+	char* ascii_encode = (char*)calloc(length << 1 + 1, sizeof(char));
+	ascii_encode[length << 1] = '\0';
+	for (int i = 0; i < length; ++i) {
+		int num = *(m + i);
+		strcat(ascii_encode, TransformInt2Hex(num));
+	}
+	return ascii_encode;
 }

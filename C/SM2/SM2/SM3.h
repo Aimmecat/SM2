@@ -36,7 +36,7 @@
 
 void RegisterInit(void);
 void CF(String* m, int idx);
-void CreateHv(String* m);
+char* CreateHv(String* m);
 Register32 GetTj(int j);
 Register32 FF(Register32 x, Register32 y, Register32 z, int j);
 Register32 GG(Register32 x, Register32 y, Register32 z, int j);

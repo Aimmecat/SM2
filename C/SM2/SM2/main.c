@@ -1,33 +1,16 @@
 #include "headfile.h"
 
+char* IDa = "31323334353637383132333435363738";
+char* ENTLa = "0080";
+char* m = "message digest";
+char* xa = "09F9DF311E5421A150DD7D161E4BC5C672179FAD1833FC076BB08FF356F35020";
+char* ya = "CCEA490CE26775A52DC6EA718CC1AA600AED05FBF35E084A6632F6072DA9AD13";
+char* dA = "3945208F7B2144B13F36E38AC6D39F95889393692860B51A42FB81EF4DF7C5B8";
 
 int main()
 {
-	char* data1 = "616263";
-	char* data2 = "61626364616263646162636461626364616263646162636461626364616263646162636461626364616263646162636461626364616263646162636461626364";
-
-	double start, end = 0;
-
-	start = clock();
-	String* test1;
-	for (int i = 0; i < 1000; ++i) {
-		test1 = NewString(data1);
-		CreateHv(test1);
-	}
-	end = clock();
-	printf("%lf\n", (end - start) / CLK_TCK * 1000);
-	printf("%s\n", test1->hash);
-
-	start = clock();
-	String* test2;
-	for (int i = 0; i < 1000; ++i) {
-		test2 = NewString(data2);
-		CreateHv(test2);
-	}
-	end = clock();
-	printf("%lf\n", (end - start) / CLK_TCK * 1000);
-	printf("%s", test2->hash);
-
-
+	mip = mirsys(1000, 16);
+	Signature(IDa, ENTLa, m, xa, ya, dA);
 	return 0;
 }
+ 

@@ -189,8 +189,8 @@ def JacobiSlideWindowPlus(k, preP: dict, w: int = 4):
 
 if __name__ == "__main__":
     pass
-    # x1, y1 = 23, 118
-    # x2, y2 = 32, 192
+    # x1, y1 = 24, 118
+    # x2, y2 = 31, 192
     #
     # hex_x1, hex_y1 = hex(x1).replace('0x', ''), hex(y1).replace('0x', '')
     # hex_x2, hex_y2 = hex(x2).replace('0x', ''), hex(y2).replace('0x', '')
